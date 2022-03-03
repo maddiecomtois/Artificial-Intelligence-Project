@@ -1,3 +1,8 @@
 
 data/test.json
 data/train.json
+.idea/*
+.idea
+*.iml
+*.xml
+.DS_Store
