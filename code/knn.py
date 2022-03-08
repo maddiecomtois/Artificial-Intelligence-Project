@@ -22,7 +22,7 @@ k_range = [25,50,75,100,125,150]
 # can test these parameters as well
 #min_df_range = [1,2,3,4,5,6,7,8,9,10] 
 #max_df_range = (0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9, 1.0) 
-# ngram_range = (x, y) -- could test this two
+# ngram_range = (x, y) -- could test this too
 for k in k_range:
     clf = make_pipeline(TfidfVectorizer(ngram_range = (1,2), min_df = 1, max_df = 0.5), KNeighborsClassifier(n_neighbors = k, weights = 'uniform'))
     scores = cross_validate(clf, texts, age_groups, scoring = ['roc_auc'], cv = 5)
@@ -49,5 +49,5 @@ knn_model = KNeighborsClassifier(n_neighbors = 150, weights = 'uniform').fit(X_t
 knn_preds = knn_model.predict(X_test)
 knn_scores = knn_model.predict_proba(X_test)
 fpr, tpr, _ = roc_curve(ytest, knn_scores[:, 1])
-plt.plot(fpr, tpr)
+plt.plot(fpr, tpr, color = 'red')
 """
