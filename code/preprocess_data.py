@@ -76,7 +76,7 @@ def remove_emojis(post):
 # This function cleans the data by only using english words,
 # autocorrecting, and removing non-alpabetical characters.
 # It then stems the words.
-def preprocess_data(x,fix_spelling=True,only_alpha=True,no_emojis=True,stop_words=True):
+def preprocess_data(x,fix_spelling=True,only_alpha=False,no_emojis=False,stop_words=True):
     stemmer = PorterStemmer()
     spell = Speller(fast=True)
     for idx, post in enumerate(x):
