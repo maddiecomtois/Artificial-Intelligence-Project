@@ -101,7 +101,19 @@ def preprocess_data(x,fix_spelling=True,only_alpha=False,no_emojis=False,stop_wo
         x[idx] = post
     return x
 
-
+# This function categorises an age according to its age group. 
+def group_ages(y):
+    y_group = []
+    for age in y:
+        age_num = int(age)
+        if age_num <=17:
+            y_group.append(1)
+        elif age_num <=27:
+            y_group.append(2)
+        else:
+            y_group.append(3)
+    return y_group
+    
 def main():
     x1, x2, y = read_dataset()
 
@@ -112,7 +124,11 @@ def main():
     # Some examples are the removal of emojis and spelling correction.
     # If these optional pre-processing steps are unwanted, set them to False.
     results = preprocess_data(x1)
-    output_data = {"posts": results, "genders": x2, "ages": y}
+
+    # Grouping the ages into three categories.
+    y_group = group_ages(y)
+    y_num = [int(y_i) for y_i in y]
+    output_data = {"posts": results, "genders": x2, "ages": y_num, "group_ages": y_group}
 
     # # If you want to store the data as an array of objects.
     # output_data = [{
@@ -122,7 +138,7 @@ def main():
     # } for post, gender, age in zip(result, x2, y)]
 
     print('writing data to file')
-    json_file = open("output.json", "w")
+    json_file = open("data/output.json", "w")
     json_file.write(json.dumps(output_data))
     json_file.close()
 
