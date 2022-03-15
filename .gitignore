@@ -6,3 +6,4 @@ data/train.json
 *.iml
 *.xml
 .DS_Store
+*.pyc

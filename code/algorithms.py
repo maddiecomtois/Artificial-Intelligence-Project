@@ -38,7 +38,7 @@ if __name__ == "__main__":
     #main()
 
     # read in data json
-    df = pd.read_json('../example_output.json')
+    df = pd.read_json('../data/example_output.json')
     x1 = np.array(df['posts'])
     x2 = np.array(df['genders'])
     y = np.array(df['ages'])
