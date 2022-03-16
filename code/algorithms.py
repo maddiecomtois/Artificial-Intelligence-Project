@@ -1,9 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from preprocess_data import main
 from deep_learning import deep_learning_algorithm
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, roc_curve, auc, mean_squared_error
 
 def plot_roc():
@@ -34,20 +32,28 @@ def plot_roc():
 
 if __name__ == "__main__":
     
-    # preprocess data
-    #main()
+    # read in training set
+    df_train = pd.read_json('../train_output.json')
+    
+    x1 = np.array(df_train['posts'])
+    x2 = np.array(df_train['genders'])
+    y_train = np.array(df_train['ages'])
+
+    x_train = np.column_stack((x1, x2))
 
     # read in data json
-    df = pd.read_json('../data/example_output.json')
-    x1 = np.array(df['posts'])
-    x2 = np.array(df['genders'])
-    y = np.array(df['group_ages'])
+    df_test = pd.read_json('../test_output.json')
 
+    x1 = np.array(df_test['posts'])
+    x2 = np.array(df_test['genders'])
+    y_test = np.array(df_test['ages'])
+
+    x_test = np.column_stack((x1, x2))
+    
     # split data into train and test sets
-    x_train, x_test, y_train, y_test = train_test_split(x1, y, train_size=0.75, shuffle=False)
 
     # algorithm 1 predictions
-    #predictionsLogistic, logisticModel = LogisticRegressionFunction(x_train, x_test, y_train, y_test)
+    predictionsLogistic, logisticModel = LogisticRegressionFunction(x_train, y_train, x_test, y_test)
     
     # algorithm 2 predictions
     #predictionsKnn, knnModel = KnnFunction(x_train, x_test, y_train, y_test)
