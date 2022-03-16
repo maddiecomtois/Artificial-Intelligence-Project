@@ -13,7 +13,7 @@ def read_dataset():
     x2 = []
     y = []
 
-    input_file = open('data/train.json')
+    input_file = open('../data/train.json')
     data = json.load(input_file)
     for item in data:
         x1.append(item['post'])
@@ -116,6 +116,7 @@ def group_ages(y):
     
 def main():
     x1, x2, y = read_dataset()
+    x1, x2, y =  x1[0:1000], x2[0:1000], y[0:1000]
 
     # Preprocessing blog posts.
     print('preprocessing data')
@@ -138,7 +139,7 @@ def main():
     # } for post, gender, age in zip(result, x2, y)]
 
     print('writing data to file')
-    json_file = open("data/output.json", "w")
+    json_file = open("../data/pre_train.json", "w")
     json_file.write(json.dumps(output_data))
     json_file.close()
 
