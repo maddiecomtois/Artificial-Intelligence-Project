@@ -43,9 +43,6 @@ if __name__ == "__main__":
 
     # read in data json
     df_test = pd.read_json('../test_output.json')
-    x1 = np.array(df['posts'])
-    x2 = np.array(df['genders'])
-    y = np.array(df['group_ages'])
 
     x1 = np.array(df_test['posts'])
     x2 = np.array(df_test['genders'])
