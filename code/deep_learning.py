@@ -1,9 +1,6 @@
-import pandas as pd
-import numpy as np
 from sklearn.neural_network import MLPClassifier
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
-
 
 def deep_learning_algorithm(X_train, X_test, y_train, y_test):
     # read in the data
@@ -49,8 +46,8 @@ def deep_learning_algorithm(X_train, X_test, y_train, y_test):
     X_test_tfidf.shape
 
     # instantiate the classifier: 3 layers (set count to number of features, e.g. is 8), relu activation function, adam is solver for weight optimisation
-    mlp = MLPClassifier(hidden_layer_sizes=(8,8,8), activation='relu', solver='adam', max_iter=500)
-    mlp.fit(X_train_tfidf,y_train)
+    mlp = MLPClassifier(hidden_layer_sizes=(2, 2, 2), activation='relu', solver='adam', max_iter=500)
+    mlp.fit(X_train_tfidf, y_train)
 
     # generate predictions 
     predict_train = mlp.predict(X_train_tfidf)
