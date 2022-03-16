@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from deep_learning import deep_learning_algorithm
 from sklearn.metrics import confusion_matrix, roc_curve, auc, mean_squared_error
+from sklearn.feature_extraction.text import CountVectorizer
 
 def plot_roc():
     # algorithm 1
@@ -39,7 +40,9 @@ if __name__ == "__main__":
     x2 = np.array(df_train['genders'])
     y_train = np.array(df_train['ages'])
 
-    x_train = np.column_stack((x1, x2))
+    # use Bag of Words to transform text into numbers
+    count_vect = CountVectorizer()
+    X_train_counts = count_vect.fit_transform(x1)
 
     # read in data json
     df_test = pd.read_json('../data/pre_test.json')
@@ -48,40 +51,37 @@ if __name__ == "__main__":
     x2 = np.array(df_test['genders'])
     y_test = np.array(df_test['ages'])
 
-    x_test = np.column_stack((x1, x2))
+    X_test_counts = count_vect.transform(x1)
     
     # algorithm 1 predictions
-    predictionsLogistic, logisticModel = LogisticRegressionFunction(x_train, y_train, x_test, y_test)
+    #predictionsLogistic, logisticModel = LogisticRegressionFunction(X_train_counts, y_train, X_test_counts, y_test)
     
     # algorithm 2 predictions
-    predictionsKnn, knnModel = KnnFunction(x_train, x_test, y_train, y_test)
+    #predictionsKnn, knnModel = KnnFunction(X_train_counts, X_test_counts, y_train, y_test)
 
     # algorithm 3 predictions
-    predictionsDeepLearning, deepLModel = deep_learning_algorithm(x_train, x_test, y_train, y_test)
+    predictionsDeepLearning, deepLModel = deep_learning_algorithm(X_train_counts, X_test_counts, y_train, y_test)
 
     
     # evaluating the three algorithms...
     
     # mean squared error
-    mseLogistic = mean_squared_error(y_test, predictionsLogistic)
-    mseKnn = mean_squared_error(y_test, predictionsKnn)
+    #mseLogistic = mean_squared_error(y_test, predictionsLogistic)
+    #mseKnn = mean_squared_error(y_test, predictionsKnn)
     mseDeepL = mean_squared_error(y_test, predictionsDeepLearning)
 
-    print("\nLogistic Regression MSE\n", mseLogistic)
-    print("\nKNN Confusion MSE:\n", mseKnn)
-    print("\nKNN Confusion MSE:\n", mseDeepL)
+    #print("\nLogistic Regression MSE\n", mseLogistic)
+    #print("\nKNN Confusion MSE:\n", mseKnn)
+    print("\Deep Learning Confusion MSE:\n", mseDeepL)
 
     # confusion matrix
-    cmLogistic = confusion_matrix(y_test, predictionsLogistic)
-    cmKnn = confusion_matrix(y_test, predictionsKnn)
+    #cmLogistic = confusion_matrix(y_test, predictionsLogistic)
+    #cmKnn = confusion_matrix(y_test, predictionsKnn)
     cmDeepL = confusion_matrix(y_test, predictionsDeepLearning)
 
-    print("\nLogistic Regression Confusion Matrix\n", cmLogistic)
-    print("\nKNN Confusion Matrix:\n", cmKnn)
+    #print("\nLogistic Regression Confusion Matrix\n", cmLogistic)
+    #print("\nKNN Confusion Matrix:\n", cmKnn)
     print("\nDeep Learning Confusion Matrix:\n", cmDeepL)
 
     # roc curve
-    plot_roc()
-
-
-    pass
+    #plot_roc()
