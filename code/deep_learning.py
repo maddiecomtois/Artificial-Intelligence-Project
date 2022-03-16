@@ -55,5 +55,6 @@ def deep_learning_algorithm(X_train, X_test, y_train, y_test):
     # generate predictions 
     predict_train = mlp.predict(X_train_tfidf)
     #predict_test = mlp.predict(X_test_tfidf)
+    return predict_train, mlp
 
 

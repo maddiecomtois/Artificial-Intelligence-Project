@@ -47,10 +47,10 @@ if __name__ == "__main__":
     x_train, x_test, y_train, y_test = train_test_split(x1, y, train_size=0.75, shuffle=False)
 
     # algorithm 1 predictions
-    predictionsLogistic, logisticModel = LogisticRegressionFunction(x_train, x_test, y_train, y_test)
+    #predictionsLogistic, logisticModel = LogisticRegressionFunction(x_train, x_test, y_train, y_test)
     
     # algorithm 2 predictions
-    predictionsKnn, knnModel = KnnFunction(x_train, x_test, y_train, y_test)
+    #predictionsKnn, knnModel = KnnFunction(x_train, x_test, y_train, y_test)
 
     # algorithm 3 predictions
     predictionsDeepLearning, deepLModel = deep_learning_algorithm(x_train, x_test, y_train, y_test)
