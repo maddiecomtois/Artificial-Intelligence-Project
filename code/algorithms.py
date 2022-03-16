@@ -41,8 +41,11 @@ if __name__ == "__main__":
 
     x_train = np.column_stack((x1, x2))
 
-    # read in testing set
+    # read in data json
     df_test = pd.read_json('../test_output.json')
+    x1 = np.array(df['posts'])
+    x2 = np.array(df['genders'])
+    y = np.array(df['group_ages'])
 
     x1 = np.array(df_test['posts'])
     x2 = np.array(df_test['genders'])
@@ -56,7 +59,7 @@ if __name__ == "__main__":
     predictionsLogistic, logisticModel = LogisticRegressionFunction(x_train, y_train, x_test, y_test)
     
     # algorithm 2 predictions
-    predictionsKnn, knnModel = KnnFunction(x_train, x_test, y_train, y_test)
+    #predictionsKnn, knnModel = KnnFunction(x_train, x_test, y_train, y_test)
 
     # algorithm 3 predictions
     predictionsDeepLearning, deepLModel = deep_learning_algorithm(x_train, x_test, y_train, y_test)
