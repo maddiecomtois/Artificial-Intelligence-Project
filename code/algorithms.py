@@ -41,7 +41,7 @@ if __name__ == "__main__":
     df = pd.read_json('../data/example_output.json')
     x1 = np.array(df['posts'])
     x2 = np.array(df['genders'])
-    y = np.array(df['ages'])
+    y = np.array(df['group_ages'])
 
     # split data into train and test sets
     x_train, x_test, y_train, y_test = train_test_split(x1, y, train_size=0.75, shuffle=False)
