@@ -13,7 +13,7 @@ def read_dataset():
     x2 = []
     y = []
 
-    input_file = open('../data/train.json')
+    input_file = open('../data/test.json')
     data = json.load(input_file)
     for item in data:
         x1.append(item['post'])
@@ -139,7 +139,7 @@ def main():
     # } for post, gender, age in zip(result, x2, y)]
 
     print('writing data to file')
-    json_file = open("../data/pre_train.json", "w")
+    json_file = open("../data/pre_test.json", "w")
     json_file.write(json.dumps(output_data))
     json_file.close()
 
