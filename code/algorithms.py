@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from deep_learning import deep_learning_algorithm
-from sklearn.metrics import confusion_matrix, roc_curve, auc, mean_squared_error
+from sklearn.metrics import multilabel_confusion_matrix, roc_curve, auc, accuracy_score, classification_report
 from sklearn.feature_extraction.text import CountVectorizer
 
 def plot_roc():
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     
     x1 = np.array(df_train['posts'])
     x2 = np.array(df_train['genders'])
-    y_train = np.array(df_train['ages'])
+    y_train = np.array(df_train['group_ages'])
 
     # use Bag of Words to transform text into numbers
     count_vect = CountVectorizer()
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
     x1 = np.array(df_test['posts'])
     x2 = np.array(df_test['genders'])
-    y_test = np.array(df_test['ages'])
+    y_test = np.array(df_test['group_ages'])
 
     X_test_counts = count_vect.transform(x1)
     
@@ -65,23 +65,35 @@ if __name__ == "__main__":
     
     # evaluating the three algorithms...
     
-    # mean squared error
-    #mseLogistic = mean_squared_error(y_test, predictionsLogistic)
-    #mseKnn = mean_squared_error(y_test, predictionsKnn)
-    mseDeepL = mean_squared_error(y_test, predictionsDeepLearning)
+    # accuracy score
+    #accLogistic = accuracy_score(y_test, predictionsLogistic)
+    #print(f"Accuracy of the LG classifier is: {accLogistic}")
 
-    #print("\nLogistic Regression MSE\n", mseLogistic)
-    #print("\nKNN Confusion MSE:\n", mseKnn)
-    print("\Deep Learning Confusion MSE:\n", mseDeepL)
+    #accKnn = accuracy_score(y_test, predictionsKnn)
+    #print(f"Accuracy of the kNN classifier is: {accKnn}")
+
+    accDeepL = accuracy_score(y_test, predictionsDeepLearning)
+    print(f"Accuracy of the Deep Learning classifier is: {accDeepL}")
 
     # confusion matrix
-    #cmLogistic = confusion_matrix(y_test, predictionsLogistic)
-    #cmKnn = confusion_matrix(y_test, predictionsKnn)
-    cmDeepL = confusion_matrix(y_test, predictionsDeepLearning)
-
+    #cmLogistic = multilabel_confusion_matrix(y_test, predictionsLogistic)
     #print("\nLogistic Regression Confusion Matrix\n", cmLogistic)
+
+    #cmKnn = multilabel_confusion_matrix(y_test, predictionsKnn)
     #print("\nKNN Confusion Matrix:\n", cmKnn)
+
+    cmDeepL = multilabel_confusion_matrix(y_test, predictionsDeepLearning)
     print("\nDeep Learning Confusion Matrix:\n", cmDeepL)
+
+    # Print the precision and recall, among other metrics
+    #print("\nLogistic Regression Classification Report:\n")
+    #print(classification_report(y_test, predictionsLogistic, digits=3))
+
+    #print("\nLogistic Regression Classification Report:\n")
+    #print(classification_report(y_test, predictionsKnn, digits=3))
+
+    print("\nDeep Learning Classification Report:\n")
+    print(classification_report(y_test, predictionsDeepLearning, digits=3))
 
     # roc curve
     #plot_roc()
