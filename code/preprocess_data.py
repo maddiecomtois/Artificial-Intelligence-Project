@@ -5,6 +5,10 @@ from autocorrect import Speller
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
+from emot.emo_unicode import EMOTICONS_EMO
+
+emot_words = {}
+valid_token = re.compile(r"^[\da-zA-Z0-1\s_\-\(\)\/!\.,\?]+$")
 
 
 # This function reads in the dataset to X, y, and z.
@@ -13,7 +17,7 @@ def read_dataset():
     x2 = []
     y = []
 
-    input_file = open('../data/test.json')
+    input_file = open('../data/train.json')
     data = json.load(input_file)
     for item in data:
         x1.append(item['post'])
@@ -23,7 +27,7 @@ def read_dataset():
         else:
             x2.append(0)
         y.append(item['age'])
-    return x1, x2, y
+    return x1[0:10000], x2[0:10000], y[0:10000]
 
 
 # This checks if a token and the following token forms a contraction.
@@ -36,87 +40,75 @@ def is_contraction(token):
     return contraction
 
 
-# This function removes any non-alphabetical tokens
-# or tokens that are not contractions, e.g. "n't".
+# This function removes any tokens that contain non-alphanumeric
+# non-regular (e.g. not brackets, underscores, etc.) characters.
+# An exception is made for contractions, e.g. "n't".
 def is_valid_token(token):
-    is_valid = False
-    if token.isalpha() or is_contraction(token):
-        if len(token) == len(token.encode()):
-            is_valid = True
-    return is_valid
+    return valid_token.match(token) or is_contraction(token)
 
 
-# removes a wide range of emojis + other undesirable symbols. Taken from https://stackoverflow.com/a/58356570/9748476
-def remove_emojis(post):
-    emoj = re.compile(
-        "["
-        u"\U0001F600-\U0001F64F"  # emoticons
-        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
-        u"\U0001F680-\U0001F6FF"  # transport & map symbols
-        u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
-        u"\U00002500-\U00002BEF"  # chinese char
-        u"\U00002702-\U000027B0"
-        u"\U00002702-\U000027B0"
-        u"\U000024C2-\U0001F251"
-        u"\U0001f926-\U0001f937"
-        u"\U00010000-\U0010ffff"
-        u"\u2640-\u2642"
-        u"\u2600-\u2B55"
-        u"\u200d"
-        u"\u23cf"
-        u"\u23e9"
-        u"\u231a"
-        u"\ufe0f"
-        u"\u3030"
-        "]+",
-        re.UNICODE)
-    return re.sub(emoj, '', post)
+# replaces a wide range of emoticons with word-versions describing them.
+def replace_emoticons(post):
+    for emot in emot_words:
+        post = re.sub(re.escape(emot), emot_words[emot], post)
+    return post
+
+
+def create_emot_dict():
+    for emot in EMOTICONS_EMO:
+        repl = " " + "_".join(EMOTICONS_EMO[emot].replace(",",
+                                                          "").split()) + " "
+        emot_words[emot] = repl
 
 
 # This function cleans the data by only using english words,
 # autocorrecting, and removing non-alpabetical characters.
 # It then stems the words.
-def preprocess_data(x,fix_spelling=True,only_alpha=False,no_emojis=False,stop_words=True):
+def preprocess_data(x,
+                    fix_spelling=True,
+                    only_valid=True,
+                    replace_emot=True,
+                    stop_words=True):
     stemmer = PorterStemmer()
     spell = Speller(fast=True)
+    if replace_emot:
+        create_emot_dict()
+
     for idx, post in enumerate(x):
         if fix_spelling is True:
             post = spell(post)
-        if no_emojis is True:
-            remove_emojis(post)
-        if langid.classify(post)[0] == "en":
-            post = word_tokenize(post)
-            valid_review = []
-            for token in post:
-                if only_alpha is False or is_valid_token(token):
-                    valid_review.append(stemmer.stem(token))
-            if stop_words:
-                valid_review = [
-                    word for word in valid_review
-                    if word not in set(stopwords.words('english'))
-                ]
-            post = " ".join(valid_review)
-        else:
-            post = ""
+        if replace_emot is True:
+            post = replace_emoticons(post)
+        post = word_tokenize(post)
+        valid_review = []
+        for token in post:
+            if only_valid is False or is_valid_token(token):
+                valid_review.append(stemmer.stem(token))
+        if stop_words:
+            valid_review = [
+                word for word in valid_review
+                if word not in set(stopwords.words('english'))
+            ]
+        post = " ".join(valid_review)
         x[idx] = post
     return x
 
-# This function categorises an age according to its age group. 
+
+# This function categorises an age according to its age group.
 def group_ages(y):
     y_group = []
     for age in y:
-        age_num = int(age)
-        if age_num <=17:
+        if age <= 17:
             y_group.append(1)
-        elif age_num <=27:
+        elif age <= 27:
             y_group.append(2)
         else:
             y_group.append(3)
     return y_group
-    
+
+
 def main():
     x1, x2, y = read_dataset()
-    x1, x2, y =  x1[0:1000], x2[0:1000], y[0:1000]
 
     # Preprocessing blog posts.
     print('preprocessing data')
@@ -127,9 +119,14 @@ def main():
     results = preprocess_data(x1)
 
     # Grouping the ages into three categories.
-    y_group = group_ages(y)
     y_num = [int(y_i) for y_i in y]
-    output_data = {"posts": results, "genders": x2, "ages": y_num, "group_ages": y_group}
+    y_group = group_ages(y_num)
+    output_data = {
+        "posts": results,
+        "genders": x2,
+        "ages": y_num,
+        "group_ages": y_group
+    }
 
     # # If you want to store the data as an array of objects.
     # output_data = [{
@@ -139,7 +136,7 @@ def main():
     # } for post, gender, age in zip(result, x2, y)]
 
     print('writing data to file')
-    json_file = open("../data/pre_test.json", "w")
+    json_file = open("../data/pre_train.json", "w")
     json_file.write(json.dumps(output_data))
     json_file.close()
 
