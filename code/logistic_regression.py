@@ -1,21 +1,21 @@
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
-from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import cross_validate
 from sklearn.metrics import confusion_matrix
-from sklearn.metrics import roc_curve
 from sklearn.pipeline import make_pipeline
+from sklearn.feature_extraction.text import TfidfTransformer
 
-# read in dataset
-df = pd.read_csv("")
-texts = df.iloc[:, 0]
-age_groups = df.iloc[:, 1]
-genders = df.iloc[:, 2]
+def logistic_regression_algorithm (X_train, X_test, y_train, y_test):
+    tfidf_transformer = TfidfTransformer()
+    X_train = tfidf_transformer.fit_transform(X_train)
+    X_test = tfidf_transformer.transform(X_test)
+    lr_model = LogisticRegression(penalty = 'l2', C = 50, solver = 'lbfgs').fit(X_train, y_test)
+    lr_preds = lr_model.predict(X_test)
+    
+    return lr_preds, lr_model
 
+
+# crossvalidation code
+"""
 mean_sq_errors = []; std_devs = []
 C_range = [1, 3, 5, 10, 25, 50, 75]
 # can test these parameters as well
@@ -31,19 +31,4 @@ for C in C_range:
 plt.errorbar(C_range, mean_sq_errors, yerr = std_devs, elinewidth = 2.5)
 plt.xlabel('C'); plt.ylabel('AUC')
 plt.show()
-
-# --- after we choose parameters, evaluate the models ---
-"""
-# plot ROC curve
-plt.rc('font', size = 15)
-plt.rcParams['figure.constrained_layout.use'] = True
-xtrain, xtest, ytrain, ytest = train_test_split(texts, age_groups, test_size = 0.2)
-
-vec = TfidfVectorizer(ngram_range = (1,2), min_df = 1, max_df = 0.2)
-X_train = vec.fit_transform(xtrain)
-X_test = vec.transform(xtest)
-lr_model = LogisticRegression(penalty = 'l2', C = 50, solver = 'lbfgs').fit(X_train, ytrain)
-fpr, tpr, _ = roc_curve(ytest, lr_model.decision_function(X_test)) #log_preds
-lr_preds = lr_model.predict(X_test)
-plt.plot(fpr, tpr, color = 'blue')
 """
