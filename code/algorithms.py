@@ -54,10 +54,10 @@ if __name__ == "__main__":
     X_test_counts = count_vect.transform(x1)
     
     # algorithm 1 predictions
-    #predictionsLogistic, logisticModel = LogisticRegressionFunction(X_train_counts, y_train, X_test_counts, y_test)
+    predictionsLogistic, logisticModel = LogisticRegressionFunction(X_train_counts, y_train, X_test_counts, y_test)
     
     # algorithm 2 predictions
-    #predictionsKnn, knnModel = KnnFunction(X_train_counts, X_test_counts, y_train, y_test)
+    predictionsKnn, knnModel = KnnFunction(X_train_counts, X_test_counts, y_train, y_test)
 
     # algorithm 3 predictions
     predictionsDeepLearning, deepLModel = deep_learning_algorithm(X_train_counts, X_test_counts, y_train, y_test)
@@ -66,31 +66,31 @@ if __name__ == "__main__":
     # evaluating the three algorithms...
     
     # accuracy score
-    #accLogistic = accuracy_score(y_test, predictionsLogistic)
-    #print(f"Accuracy of the LG classifier is: {accLogistic}")
+    accLogistic = accuracy_score(y_test, predictionsLogistic)
+    print(f"Accuracy of the LG classifier is: {accLogistic}")
 
-    #accKnn = accuracy_score(y_test, predictionsKnn)
-    #print(f"Accuracy of the kNN classifier is: {accKnn}")
+    accKnn = accuracy_score(y_test, predictionsKnn)
+    print(f"Accuracy of the kNN classifier is: {accKnn}")
 
     accDeepL = accuracy_score(y_test, predictionsDeepLearning)
     print(f"Accuracy of the Deep Learning classifier is: {accDeepL}")
 
-    # confusion matrix
-    #cmLogistic = multilabel_confusion_matrix(y_test, predictionsLogistic)
-    #print("\nLogistic Regression Confusion Matrix\n", cmLogistic)
+    # confusion matrices
+    cmLogistic = multilabel_confusion_matrix(y_test, predictionsLogistic)
+    print("\nLogistic Regression Confusion Matrix\n", cmLogistic)
 
-    #cmKnn = multilabel_confusion_matrix(y_test, predictionsKnn)
-    #print("\nKNN Confusion Matrix:\n", cmKnn)
+    cmKnn = multilabel_confusion_matrix(y_test, predictionsKnn)
+    print("\nKNN Confusion Matrix:\n", cmKnn)
 
     cmDeepL = multilabel_confusion_matrix(y_test, predictionsDeepLearning)
     print("\nDeep Learning Confusion Matrix:\n", cmDeepL)
 
     # Print the precision and recall, among other metrics
-    #print("\nLogistic Regression Classification Report:\n")
-    #print(classification_report(y_test, predictionsLogistic, digits=3))
+    print("\nLogistic Regression Classification Report:\n")
+    print(classification_report(y_test, predictionsLogistic, digits=3))
 
-    #print("\nLogistic Regression Classification Report:\n")
-    #print(classification_report(y_test, predictionsKnn, digits=3))
+    print("\nLogistic Regression Classification Report:\n")
+    print(classification_report(y_test, predictionsKnn, digits=3))
 
     print("\nDeep Learning Classification Report:\n")
     print(classification_report(y_test, predictionsDeepLearning, digits=3))
