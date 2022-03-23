@@ -2,10 +2,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from deep_learning import deep_learning_algorithm
+from logistic_regression import logistic_regression_algorithm
+from knn import knn_algorithm
 from sklearn.metrics import multilabel_confusion_matrix, roc_curve, auc, accuracy_score, classification_report
 from sklearn.feature_extraction.text import CountVectorizer
 
-def plot_roc():
+def plot_roc(x_test, y_test):
     # algorithm 1
     fpr, tpr, _ = roc_curve(y_test, logisticModel.decision_function(x_test))
     plt.plot(fpr, tpr, label="Logistic")
@@ -54,10 +56,10 @@ if __name__ == "__main__":
     X_test_counts = count_vect.transform(x1)
     
     # algorithm 1 predictions
-    predictionsLogistic, logisticModel = LogisticRegressionFunction(X_train_counts, y_train, X_test_counts, y_test)
+    predictionsLogistic, logisticModel = logistic_regression_algorithm(X_train_counts, y_train, X_test_counts, y_test)
     
     # algorithm 2 predictions
-    predictionsKnn, knnModel = KnnFunction(X_train_counts, X_test_counts, y_train, y_test)
+    predictionsKnn, knnModel = knn_algorithm(X_train_counts, X_test_counts, y_train, y_test)
 
     # algorithm 3 predictions
     predictionsDeepLearning, deepLModel = deep_learning_algorithm(X_train_counts, X_test_counts, y_train, y_test)
@@ -96,4 +98,4 @@ if __name__ == "__main__":
     print(classification_report(y_test, predictionsDeepLearning, digits=3))
 
     # roc curve
-    #plot_roc()
+    #plot_roc(x_test, y_test)
