@@ -5,7 +5,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.pipeline import make_pipeline
 
 
-def logistic_regression_algorithm (X_train, X_test, y_train, y_test):
+def logistic_regression_knn_algorithm (X_train, X_test, y_train, y_test):
     tfidf_transformer = TfidfTransformer()
     X_train = tfidf_transformer.fit_transform(X_train)
     X_test = tfidf_transformer.transform(X_test)
