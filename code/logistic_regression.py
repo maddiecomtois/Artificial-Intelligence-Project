@@ -2,19 +2,14 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_validate
 from sklearn.metrics import confusion_matrix
 from sklearn.pipeline import make_pipeline
-from sklearn.feature_extraction.text import TfidfTransformer
 
 
 def logistic_regression_algorithm(X_train, X_test, y_train, y_test):
-    # use tf-idf to give weights to the words
-    tfidf_transformer = TfidfTransformer()
-    X_train_tfidf = tfidf_transformer.fit_transform(X_train)
-    X_test_tfidf = tfidf_transformer.transform(X_test)
 
     lr_model = LogisticRegression(penalty='l2', C=50, solver='lbfgs')
-    lr_model.fit(X_train_tfidf, y_train)
+    lr_model.fit(X_train, y_train)
 
-    lr_preds = lr_model.predict(X_test_tfidf)
+    lr_preds = lr_model.predict(X_test)
     return lr_preds, lr_model
 
 

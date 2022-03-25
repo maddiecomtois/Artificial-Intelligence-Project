@@ -7,6 +7,7 @@ from knn import knn_algorithm
 from sklearn.metrics import multilabel_confusion_matrix, roc_curve, auc, accuracy_score, classification_report
 from sklearn.feature_extraction.text import CountVectorizer
 from scipy import sparse
+from sklearn.feature_extraction.text import TfidfTransformer
 
 
 def plot_roc(x_test, y_test):
@@ -60,17 +61,22 @@ if __name__ == "__main__":
     X_test_counts = count_vect.transform(x1)
     X_test_counts = sparse.hstack((X_test_counts, x2))
 
+    # use tf-idf to give weights to the words
+    tfidf_transformer = TfidfTransformer()
+    X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)
+    X_test_tfidf = tfidf_transformer.transform(X_test_counts)
+
     # algorithm 1 predictions
     predictionsLogistic, logisticModel = logistic_regression_algorithm(
-        X_train_counts, X_test_counts, y_train, y_test)
+        X_train_tfidf, X_test_tfidf, y_train, y_test)
 
     # algorithm 2 predictions
-    predictionsKnn, knnModel = knn_algorithm(X_train_counts, X_test_counts,
+    predictionsKnn, knnModel = knn_algorithm(X_train_tfidf, X_test_tfidf,
                                              y_train, y_test)
 
     # algorithm 3 predictions
     predictionsDeepLearning, deepLModel = deep_learning_algorithm(
-        X_train_counts, X_test_counts, y_train, y_test)
+        X_train_tfidf, X_test_tfidf, y_train, y_test)
 
     # evaluating the three algorithms...
 
