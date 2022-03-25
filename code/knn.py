@@ -4,12 +4,12 @@ from sklearn.metrics import confusion_matrix
 from sklearn.pipeline import make_pipeline
 
 
-def knn_algorithm(X_train, X_test, y_train, y_test):
+def knn_algorithm(x_train, x_test, y_train):
 
     knn_model = KNeighborsClassifier(n_neighbors=150, weights='uniform')
-    knn_model.fit(X_train, y_train)
+    knn_model.fit(x_train, y_train)
 
-    knn_preds = knn_model.predict(X_test)
+    knn_preds = knn_model.predict(x_test)
     return knn_preds, knn_model
 
 

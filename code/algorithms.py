@@ -1,13 +1,14 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from deep_learning import deep_learning_algorithm
-from logistic_regression import logistic_regression_algorithm
-from knn import knn_algorithm
-from sklearn.metrics import multilabel_confusion_matrix, roc_curve, auc, accuracy_score, classification_report
-from sklearn.feature_extraction.text import CountVectorizer
 from scipy import sparse
-from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.metrics import (accuracy_score, auc, classification_report,
+                             multilabel_confusion_matrix, roc_curve)
+
+from deep_learning import deep_learning_algorithm
+from knn import knn_algorithm
+from logistic_regression import logistic_regression_algorithm
 
 
 def plot_roc(x_test, y_test):
@@ -17,14 +18,14 @@ def plot_roc(x_test, y_test):
     print("\nAUC Logistic:", auc(fpr, tpr))
 
     # algorithm 2
-    y_scores_knn = knnModel.predict_proba(x_test)
+    y_scores_knn = knn_model.predict_proba(x_test)
     fpr, tpr, _ = roc_curve(y_test, y_scores_knn[:, 1])
     plt.plot(fpr, tpr, label="KNN")
     print("AUC KNN:", auc(fpr, tpr))
 
     # algorithm 3
-    y_scores_deepL = deepLModel.predict_proba(x_test)
-    fpr, tpr, _ = roc_curve(y_test, y_scores_deepL[:, 1])
+    y_scores_deep = deep_model.predict_proba(x_test)
+    fpr, tpr, _ = roc_curve(y_test, y_scores_deep[:, 1])
     plt.plot(fpr, tpr, label="Deep Learning")
     print("AUC Deep Learning:", auc(fpr, tpr))
 
@@ -49,10 +50,10 @@ def preprocess_input(train_text, train_gender, test_text, test_gender):
 
     # use tf-idf to give weights to the words
     tfidf_transformer = TfidfTransformer()
-    X_train_tfidf = tfidf_transformer.fit_transform(train_text_counts)
-    X_test_tfidf = tfidf_transformer.transform(test_text_counts)
+    x_train_tfidf = tfidf_transformer.fit_transform(train_text_counts)
+    x_test_tfidf = tfidf_transformer.transform(test_text_counts)
 
-    return X_train_tfidf, X_test_tfidf
+    return x_train_tfidf, x_test_tfidf
 
 
 if __name__ == "__main__":
@@ -63,27 +64,27 @@ if __name__ == "__main__":
     # read in test set
     df_test = pd.read_json('../data/pre_test.json')
 
-    train_text = np.array(df_train['posts'])
-    train_gender = np.array([df_train['genders']])
+    train_x1 = np.array(df_train['posts'])
+    train_x2 = np.array([df_train['genders']])
     y_train = np.array(df_train['group_ages'])
 
-    test_text = np.array(df_test['posts'])
-    test_gender = np.array([df_test['genders']])
+    test_x1 = np.array(df_test['posts'])
+    test_x2 = np.array([df_test['genders']])
     y_test = np.array(df_test['group_ages'])
 
     # preprocess posts and gender input data
-    x_train, x_test = preprocess_input(train_text, train_gender, test_text, test_gender)
+    x_train, x_test = preprocess_input(train_x1, train_x2, test_x1, test_x2)
 
     # algorithm 1 predictions
     predictionsLogistic, logisticModel = logistic_regression_algorithm(
-        x_train, x_test, y_train, y_test)
+        x_train, x_test, y_train)
 
     # algorithm 2 predictions
-    predictionsKnn, knnModel = knn_algorithm(x_train, x_test, y_train, y_test)
+    predictionsKnn, knn_model = knn_algorithm(x_train, x_test, y_train)
 
     # algorithm 3 predictions
-    predictionsDeepLearning, deepLModel = deep_learning_algorithm(
-        x_train, x_test, y_train, y_test)
+    predictionsDeepLearning, deep_model = deep_learning_algorithm(
+        x_train, x_test, y_train)
 
     # evaluating the three algorithms...
 
