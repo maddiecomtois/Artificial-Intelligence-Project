@@ -49,10 +49,10 @@ def preprocess_input(train_text, train_gender, test_text, test_gender):
 
     # use tf-idf to give weights to the words
     tfidf_transformer = TfidfTransformer()
-    x_train = tfidf_transformer.fit_transform(train_text_counts)
-    x_test = tfidf_transformer.transform(test_text_counts)
+    X_train_tfidf = tfidf_transformer.fit_transform(train_text_counts)
+    X_test_tfidf = tfidf_transformer.transform(test_text_counts)
 
-    return x_train, x_test
+    return X_train_tfidf, X_test_tfidf
 
 
 if __name__ == "__main__":
