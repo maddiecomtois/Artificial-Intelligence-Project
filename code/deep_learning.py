@@ -6,7 +6,7 @@ def deep_learning_algorithm(X_train, X_test, y_train, y_test):
     # use tf-idf to give weights to the words
     tfidf_transformer = TfidfTransformer()
     X_train_tfidf = tfidf_transformer.fit_transform(X_train)
-    X_test_tfidf = tfidf_transformer.fit_transform(X_test)
+    X_test_tfidf = tfidf_transformer.transform(X_test)
 
     # instantiate the classifier: 3 layers (set count to number of features, e.g. is 8), relu activation function, adam is solver for weight optimisation
     mlp = MLPClassifier(hidden_layer_sizes=(2, 2, 2),

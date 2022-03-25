@@ -9,7 +9,7 @@ def knn_algorithm(X_train, X_test, y_train, y_test):
     # use tf-idf to give weights to the words
     tfidf_transformer = TfidfTransformer()
     X_train_tfidf = tfidf_transformer.fit_transform(X_train)
-    X_test_tfidf = tfidf_transformer.fit_transform(X_test)
+    X_test_tfidf = tfidf_transformer.transform(X_test)
 
     knn_model = KNeighborsClassifier(n_neighbors=150, weights='uniform')
     knn_model.fit(X_train_tfidf, y_train)

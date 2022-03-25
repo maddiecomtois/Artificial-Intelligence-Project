@@ -91,7 +91,7 @@ if __name__ == "__main__":
     print("\nLogistic Regression Classification Report:\n")
     print(classification_report(y_test, predictionsLogistic, digits=3))
 
-    print("\nLogistic Regression Classification Report:\n")
+    print("\nKNN Classification Report:\n")
     print(classification_report(y_test, predictionsKnn, digits=3))
 
     print("\nDeep Learning Classification Report:\n")
