@@ -6,6 +6,8 @@ from logistic_regression import logistic_regression_algorithm
 from knn import knn_algorithm
 from sklearn.metrics import multilabel_confusion_matrix, roc_curve, auc, accuracy_score, classification_report
 from sklearn.feature_extraction.text import CountVectorizer
+from scipy import sparse
+
 
 def plot_roc(x_test, y_test):
     # algorithm 1
@@ -31,42 +33,47 @@ def plot_roc(x_test, y_test):
     plt.ylabel('True positive rate')
     plt.show()
 
-# read in data and pass into each algorithm or each algorithm calls it?
 
 if __name__ == "__main__":
-    
+
     # read in training set
     df_train = pd.read_json('../data/pre_train.json')
-    
+
     x1 = np.array(df_train['posts'])
-    x2 = np.array(df_train['genders'])
+    x2 = np.array([df_train['genders']])
+    x2 = np.swapaxes(x2, 0, 1)
     y_train = np.array(df_train['group_ages'])
 
     # use Bag of Words to transform text into numbers
     count_vect = CountVectorizer()
     X_train_counts = count_vect.fit_transform(x1)
+    X_train_counts = sparse.hstack((X_train_counts, x2))
 
     # read in data json
     df_test = pd.read_json('../data/pre_test.json')
 
     x1 = np.array(df_test['posts'])
-    x2 = np.array(df_test['genders'])
+    x2 = np.array([df_test['genders']])
+    x2 = np.swapaxes(x2, 0, 1)
     y_test = np.array(df_test['group_ages'])
 
     X_test_counts = count_vect.transform(x1)
-    
+    X_test_counts = sparse.hstack((X_test_counts, x2))
+
     # algorithm 1 predictions
-    predictionsLogistic, logisticModel = logistic_regression_algorithm(X_train_counts, X_test_counts, y_train, y_test)
-    
+    predictionsLogistic, logisticModel = logistic_regression_algorithm(
+        X_train_counts, X_test_counts, y_train, y_test)
+
     # algorithm 2 predictions
-    predictionsKnn, knnModel = knn_algorithm(X_train_counts, X_test_counts, y_train, y_test)
+    predictionsKnn, knnModel = knn_algorithm(X_train_counts, X_test_counts,
+                                             y_train, y_test)
 
     # algorithm 3 predictions
-    predictionsDeepLearning, deepLModel = deep_learning_algorithm(X_train_counts, X_test_counts, y_train, y_test)
+    predictionsDeepLearning, deepLModel = deep_learning_algorithm(
+        X_train_counts, X_test_counts, y_train, y_test)
 
-    
     # evaluating the three algorithms...
-    
+
     # accuracy score
     accLogistic = accuracy_score(y_test, predictionsLogistic)
     print(f"Accuracy of the LG classifier is: {accLogistic}")
