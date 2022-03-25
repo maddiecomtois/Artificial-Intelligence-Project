@@ -1,33 +1,53 @@
+import numpy as np
+from matplotlib import pyplot as plt
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import cross_validate
-from sklearn.metrics import confusion_matrix
-from sklearn.pipeline import make_pipeline
+from sklearn.metrics import roc_auc_score
 
 
-def logistic_regression_algorithm(x_train, x_test, y_train):
+def logistic_regression_algorithm(x_train, x_test, y_train, kfold_data):
 
-    lr_model = LogisticRegression(penalty='l2', C=50, solver='lbfgs')
+    # test_penalty_values(kfold_data)
+    lr_model = LogisticRegression(penalty='l2', C=10, solver='lbfgs')
     lr_model.fit(x_train, y_train)
 
     lr_preds = lr_model.predict(x_test)
     return lr_preds, lr_model
 
 
-# crossvalidation code
-"""
-mean_sq_errors = []; std_devs = []
-C_range = [1, 3, 5, 10, 25, 50, 75]
-# can test these parameters as well
-#min_df_range = [1,2,3,4,5,6,7,8,9,10]
-#max_df_range = [0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
-# ngram_range = (x, y) -- could test this too
-for C in C_range:    
-    clf = make_pipeline(TfidfVectorizer(ngram_range = (1,2), min_df = 1, max_df = 0.6), LogisticRegression(penalty = 'l2', C = C, solver = 'lbfgs'))
-    scores = cross_validate(clf, texts, age_groups, scoring = ['roc_auc'], cv = 5)     
-    mean_sq_errors.append(np.mean(scores['test_roc_auc']))
-    std_devs.append(np.std(scores['test_roc_auc']))
-    
-plt.errorbar(C_range, mean_sq_errors, yerr = std_devs, elinewidth = 2.5)
-plt.xlabel('C'); plt.ylabel('AUC')
-plt.show()
-"""
+def use_cross_validation(kfold_data, C):
+    # This function uses k-fold cross validation to get the average ROC AUC
+    # among the k tests, as well as the standard deviation among the costs.
+    means = []
+    # A model is trained using k-1 training segments and tested on the 1 remaining segment.
+    for data in kfold_data:
+        x_train, y_train, x_test, y_test = data[0], data[1], data[2], data[3]
+        model = LogisticRegression(penalty='l2', C=C,
+                                   solver='lbfgs').fit(x_train, y_train)
+        preds = model.predict_proba(x_test)
+        means.append(roc_auc_score(y_test, preds, multi_class="ovo"))
+    mean = np.mean(means)
+    std = np.std(means)
+    return mean, std
+
+
+def plot_mean_and_std(x_range, x_name, mean_val, stds):
+    # This function plots the mean ROC AUC and standard deviation of a model over a range of values.
+    plt.errorbar(x_range, mean_val, yerr=stds)
+    plt.xlabel(x_name)
+    plt.ylabel('ROC AUC')
+    plt.show()
+
+
+def test_penalty_values(kfold_data):
+    # This function tests different C penalty values on a
+    # kernalised ridge regression model using cross validation.
+    means = []
+    stds = []
+    C_vals = [0.01, 0.1, 1, 10, 100]
+    for C in C_vals:
+        mean, std = use_cross_validation(kfold_data, C=C)
+        print("Average roc auc with C penalty value = {}: {} (+/− {})".format(
+            C, mean, std))
+        means.append(mean)
+        stds.append(std)
+    plot_mean_and_std(C_vals, "C", means, stds)

@@ -5,6 +5,7 @@ from scipy import sparse
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics import (accuracy_score, auc, classification_report,
                              multilabel_confusion_matrix, roc_curve)
+from sklearn.model_selection import KFold
 
 from deep_learning import deep_learning_algorithm
 from knn import knn_algorithm
@@ -56,6 +57,24 @@ def preprocess_input(train_text, train_gender, test_text, test_gender):
     return x_train_tfidf, x_test_tfidf
 
 
+def get_kfold_data(text_data, gender_data, y_data):
+    kfold_data = []
+    k_fold = KFold(n_splits=10)
+    for train, test in k_fold.split(text_data, y_data):
+        train_text = text_data[train]
+        test_text = text_data[test]
+
+        train_gender = gender_data[:, train]
+        test_gender = gender_data[:, test]
+        train_data, test_data = preprocess_input(train_text, train_gender,
+                                                 test_text, test_gender)
+
+        train_output = y_data[train]
+        test_output = y_data[test]
+        kfold_data.append((train_data, train_output, test_data, test_output))
+    return kfold_data
+
+
 if __name__ == "__main__":
 
     # read in training set
@@ -75,16 +94,19 @@ if __name__ == "__main__":
     # preprocess posts and gender input data
     x_train, x_test = preprocess_input(train_x1, train_x2, test_x1, test_x2)
 
+    kfold_data = get_kfold_data(train_x1, train_x2, y_train)
+
     # algorithm 1 predictions
     predictionsLogistic, logisticModel = logistic_regression_algorithm(
-        x_train, x_test, y_train)
+        x_train, x_test, y_train, kfold_data)
 
     # algorithm 2 predictions
-    predictionsKnn, knn_model = knn_algorithm(x_train, x_test, y_train)
+    predictionsKnn, knn_model = knn_algorithm(x_train, x_test, y_train,
+                                              kfold_data)
 
     # algorithm 3 predictions
     predictionsDeepLearning, deep_model = deep_learning_algorithm(
-        x_train, x_test, y_train)
+        x_train, x_test, y_train, kfold_data)
 
     # evaluating the three algorithms...
 

@@ -1,7 +1,7 @@
 from sklearn.neural_network import MLPClassifier
 
 
-def deep_learning_algorithm(x_train, x_test, y_train):
+def deep_learning_algorithm(x_train, x_test, y_train, kfold_data):
 
     # instantiate the classifier:
     # - 3 layers (set count to number of features, e.g. is 8)
