@@ -5,13 +5,16 @@ from sklearn.metrics import confusion_matrix
 from sklearn.pipeline import make_pipeline
 
 
-def knn_algorithm (X_train, X_test, y_train, y_test):
+def knn_algorithm(X_train, X_test, y_train, y_test):
+    # use tf-idf to give weights to the words
     tfidf_transformer = TfidfTransformer()
-    X_train = tfidf_transformer.fit_transform(X_train)
-    X_test = tfidf_transformer.transform(X_test)
-    knn_model = KNeighborsClassifier(n_neighbors = 150, weights = 'uniform').fit(X_train,ytrain)
-    knn_preds = knn_model.predict(X_test)
-        
+    X_train_tfidf = tfidf_transformer.fit_transform(X_train)
+    X_test_tfidf = tfidf_transformer.fit_transform(X_test)
+
+    knn_model = KNeighborsClassifier(n_neighbors=150, weights='uniform')
+    knn_model.fit(X_train_tfidf, y_train)
+    
+    knn_preds = knn_model.predict(X_test_tfidf)
     return knn_preds, knn_model
 
 

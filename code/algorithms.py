@@ -56,7 +56,7 @@ if __name__ == "__main__":
     X_test_counts = count_vect.transform(x1)
     
     # algorithm 1 predictions
-    predictionsLogistic, logisticModel = logistic_regression_algorithm(X_train_counts, y_train, X_test_counts, y_test)
+    predictionsLogistic, logisticModel = logistic_regression_algorithm(X_train_counts, X_test_counts, y_train, y_test)
     
     # algorithm 2 predictions
     predictionsKnn, knnModel = knn_algorithm(X_train_counts, X_test_counts, y_train, y_test)
