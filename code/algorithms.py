@@ -35,48 +35,55 @@ def plot_roc(x_test, y_test):
     plt.show()
 
 
+def preprocess_input(train_text, train_gender, test_text, test_gender):
+    train_gender = np.swapaxes(train_gender, 0, 1)
+    test_gender = np.swapaxes(test_gender, 0, 1)
+
+    # use Bag of Words to transform text into numbers
+    count_vect = CountVectorizer()
+    train_text_counts = count_vect.fit_transform(train_text)
+    train_text_counts = sparse.hstack((train_text_counts, train_gender))
+
+    test_text_counts = count_vect.transform(test_text)
+    test_text_counts = sparse.hstack((test_text_counts, test_gender))
+
+    # use tf-idf to give weights to the words
+    tfidf_transformer = TfidfTransformer()
+    X_train_tfidf = tfidf_transformer.fit_transform(train_text_counts)
+    X_test_tfidf = tfidf_transformer.transform(test_text_counts)
+
+    return X_train_tfidf, X_test_tfidf
+
+
 if __name__ == "__main__":
 
     # read in training set
     df_train = pd.read_json('../data/pre_train.json')
 
-    x1 = np.array(df_train['posts'])
-    x2 = np.array([df_train['genders']])
-    x2 = np.swapaxes(x2, 0, 1)
-    y_train = np.array(df_train['group_ages'])
-
-    # use Bag of Words to transform text into numbers
-    count_vect = CountVectorizer()
-    X_train_counts = count_vect.fit_transform(x1)
-    X_train_counts = sparse.hstack((X_train_counts, x2))
-
-    # read in data json
+    # read in test set
     df_test = pd.read_json('../data/pre_test.json')
 
-    x1 = np.array(df_test['posts'])
-    x2 = np.array([df_test['genders']])
-    x2 = np.swapaxes(x2, 0, 1)
+    train_text = np.array(df_train['posts'])
+    train_gender = np.array([df_train['genders']])
+    y_train = np.array(df_train['group_ages'])
+
+    test_text = np.array(df_test['posts'])
+    test_gender = np.array([df_test['genders']])
     y_test = np.array(df_test['group_ages'])
 
-    X_test_counts = count_vect.transform(x1)
-    X_test_counts = sparse.hstack((X_test_counts, x2))
-
-    # use tf-idf to give weights to the words
-    tfidf_transformer = TfidfTransformer()
-    X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)
-    X_test_tfidf = tfidf_transformer.transform(X_test_counts)
+    # preprocess posts and gender input data
+    x_train, x_test = preprocess_input(train_text, train_gender, test_text, test_gender)
 
     # algorithm 1 predictions
     predictionsLogistic, logisticModel = logistic_regression_algorithm(
-        X_train_tfidf, X_test_tfidf, y_train, y_test)
+        x_train, x_test, y_train, y_test)
 
     # algorithm 2 predictions
-    predictionsKnn, knnModel = knn_algorithm(X_train_tfidf, X_test_tfidf,
-                                             y_train, y_test)
+    predictionsKnn, knnModel = knn_algorithm(x_train, x_test, y_train, y_test)
 
     # algorithm 3 predictions
     predictionsDeepLearning, deepLModel = deep_learning_algorithm(
-        X_train_tfidf, X_test_tfidf, y_train, y_test)
+        x_train, x_test, y_train, y_test)
 
     # evaluating the three algorithms...
 
