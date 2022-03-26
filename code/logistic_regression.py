@@ -6,8 +6,8 @@ from sklearn.metrics import roc_auc_score
 
 def logistic_regression_algorithm(x_train, x_test, y_train, kfold_data):
 
-    #test_penalty_values(kfold_data)
-    lr_model = LogisticRegression(penalty='l2', C=10, solver='lbfgs', max_iter=200)
+    # test_penalty_values(kfold_data)
+    lr_model = LogisticRegression(penalty='l2', C=1, solver='lbfgs', max_iter=200)
     lr_model.fit(x_train, y_train)
 
     lr_preds = lr_model.predict(x_test)
@@ -43,7 +43,7 @@ def test_penalty_values(kfold_data):
     # kernalised ridge regression model using cross validation.
     means = []
     stds = []
-    C_vals = [0.01, 0.1, 1, 5, 10, 50]
+    C_vals = [0.001, 0.01, 0.1, 1, 10]
     for C in C_vals:
         mean, std = use_cross_validation(kfold_data, C=C)
         print("Average roc auc with C penalty value = {}: {} (+/− {})".format(

@@ -8,6 +8,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics import (accuracy_score, auc, classification_report,
                              multilabel_confusion_matrix, roc_curve)
 from sklearn.model_selection import KFold
+from sklearn.preprocessing import label_binarize
 
 from deep_learning import deep_learning_algorithm
 from knn import knn_algorithm
@@ -15,21 +16,40 @@ from logistic_regression import logistic_regression_algorithm
 
 
 def plot_roc(x_test, y_test, model, algorithm):
+    y_score = None
+    y = label_binarize(y_test, classes=[1, 2, 3])
     if algorithm == "logistic":
-        fpr, tpr, _ = roc_curve(y_test, model.decision_function(x_test))
-        plt.plot(fpr, tpr, label="Logistic")
-        print("\n AUC Logistic: ", auc(fpr, tpr))
+        y_score = model.decision_function(x_test)
     else:
-        y_scores_knn = model.predict_proba(x_test)
-        fpr, tpr, _ = roc_curve(y_test, y_scores_knn[:, 1])
-        plt.plot(fpr, tpr, label=algorithm)
-        print("AUC", algorithm, " :", auc(fpr, tpr))
+        y_score = model.predict_proba(x_test)
 
-    plt.title('ROC - ', algorithm)
-    plt.legend()
-    plt.xlabel('False positive rate')
-    plt.ylabel('True positive rate')
-    plt.show()
+    # Compute ROC curve and ROC area for each class
+    fpr = dict()
+    tpr = dict()
+    roc_auc = dict()
+    for i in [1, 2, 3]:
+        fpr[i], tpr[i], _ = roc_curve(y[:, i - 1], y_score[:, i - 1])
+        roc_auc[i] = auc(fpr[i], tpr[i])
+
+    # Compute micro-average ROC curve and ROC area
+    fpr["micro"], tpr["micro"], _ = roc_curve(y.ravel(), y_score.ravel())
+    roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
+
+    for i in [1, 2, 3]:
+        print("AUC", algorithm, " for age group ", i, ":", roc_auc[i])
+        plt.figure()
+        plt.plot(
+            fpr[i],
+            tpr[i],
+            color="darkorange",
+            label="ROC curve for %f (area = %0.2f)" % (i, roc_auc[i]),
+        )
+        plt.plot([0, 1], [0, 1], linestyle="--")
+        plt.xlabel("False Positive Rate")
+        plt.ylabel("True Positive Rate")
+        plt.title("Receiver operating characteristic example")
+        plt.legend(loc="lower right")
+        plt.show()
 
 
 def preprocess_input(train_text, train_gender, test_text, test_gender):
