@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy import sparse
+from sklearn.datasets import make_classification
+from sklearn.dummy import DummyClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics import (accuracy_score, auc, classification_report,
                              multilabel_confusion_matrix, roc_curve)
@@ -12,25 +14,18 @@ from knn import knn_algorithm
 from logistic_regression import logistic_regression_algorithm
 
 
-def plot_roc(x_test, y_test):
-    # algorithm 1
-    fpr, tpr, _ = roc_curve(y_test, logisticModel.decision_function(x_test))
-    plt.plot(fpr, tpr, label="Logistic")
-    print("\nAUC Logistic:", auc(fpr, tpr))
+def plot_roc(x_test, y_test, model, algorithm):
+    if algorithm == "logistic":
+        fpr, tpr, _ = roc_curve(y_test, model.decision_function(x_test))
+        plt.plot(fpr, tpr, label="Logistic")
+        print("\n AUC Logistic: ", auc(fpr, tpr))
+    else:
+        y_scores_knn = model.predict_proba(x_test)
+        fpr, tpr, _ = roc_curve(y_test, y_scores_knn[:, 1])
+        plt.plot(fpr, tpr, label=algorithm)
+        print("AUC", algorithm, " :", auc(fpr, tpr))
 
-    # algorithm 2
-    y_scores_knn = knn_model.predict_proba(x_test)
-    fpr, tpr, _ = roc_curve(y_test, y_scores_knn[:, 1])
-    plt.plot(fpr, tpr, label="KNN")
-    print("AUC KNN:", auc(fpr, tpr))
-
-    # algorithm 3
-    y_scores_deep = deep_model.predict_proba(x_test)
-    fpr, tpr, _ = roc_curve(y_test, y_scores_deep[:, 1])
-    plt.plot(fpr, tpr, label="Deep Learning")
-    print("AUC Deep Learning:", auc(fpr, tpr))
-
-    plt.title('ROC - Logistic, KNN, and Deep Learning')
+    plt.title('ROC - ', algorithm)
     plt.legend()
     plt.xlabel('False positive rate')
     plt.ylabel('True positive rate')
@@ -75,6 +70,27 @@ def get_kfold_data(text_data, gender_data, y_data):
     return kfold_data
 
 
+def run_algorithm(algorithm):
+    if algorithm == "logistic":
+        predictions, model = logistic_regression_algorithm(x_train, x_test, y_train, kfold_data)
+    elif algorithm == "knn":
+        predictions, model = knn_algorithm(x_train, x_test, y_train, kfold_data)
+    elif algorithm == "deep learning":
+        predictions, model = deep_learning_algorithm(x_train, x_test, y_train, kfold_data)
+    else:
+        model = DummyClassifier(strategy="most_frequent").fit(x_train, y_train)
+        predictions = model.predict(x_test)
+
+    accuracy = accuracy_score(y_test, predictions)
+    cm = multilabel_confusion_matrix(y_test, predictions)
+
+    print(f"Accuracy of {algorithm} classifier is: {accuracy}")
+    print("\n", algorithm, " Confusion Matrix\n", cm)
+    print("\n", algorithm, " Classification Report:\n")
+    print(classification_report(y_test, predictions, digits=3))
+    return model
+
+
 if __name__ == "__main__":
 
     # read in training set
@@ -95,7 +111,9 @@ if __name__ == "__main__":
     x_train, x_test = preprocess_input(train_x1, train_x2, test_x1, test_x2)
 
     kfold_data = get_kfold_data(train_x1, train_x2, y_train)
-
+    model = run_algorithm("logistic")
+    plot_roc(x_test, y_test, model, "logistic")
+    '''
     # algorithm 1 predictions
     predictionsLogistic, logisticModel = logistic_regression_algorithm(
         x_train, x_test, y_train, kfold_data)
@@ -107,10 +125,11 @@ if __name__ == "__main__":
     # algorithm 3 predictions
     predictionsDeepLearning, deep_model = deep_learning_algorithm(
         x_train, x_test, y_train, kfold_data)
-
+    
     # evaluating the three algorithms...
 
     # accuracy score
+
     accLogistic = accuracy_score(y_test, predictionsLogistic)
     print(f"Accuracy of the LG classifier is: {accLogistic}")
 
@@ -121,6 +140,7 @@ if __name__ == "__main__":
     print(f"Accuracy of the Deep Learning classifier is: {accDeepL}")
 
     # confusion matrices
+
     cmLogistic = multilabel_confusion_matrix(y_test, predictionsLogistic)
     print("\nLogistic Regression Confusion Matrix\n", cmLogistic)
 
@@ -141,4 +161,5 @@ if __name__ == "__main__":
     print(classification_report(y_test, predictionsDeepLearning, digits=3))
 
     # roc curve
-    #plot_roc(x_test, y_test)
+    plot_roc(x_test, y_test, model)
+    '''
