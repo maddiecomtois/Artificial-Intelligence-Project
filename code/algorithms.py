@@ -161,9 +161,11 @@ def model_comparison(model_predictions, y_true):
 
 if __name__ == "__main__":
 
+    print("Reading in training data...")
     # read in training set
     df_train = pd.read_json('../data/pre_train.json')
 
+    print("Reading in test data...")
     # read in test set
     df_test = pd.read_json('../data/pre_test.json')
 
@@ -175,6 +177,7 @@ if __name__ == "__main__":
     test_x2 = np.array([df_test['genders']])
     y_test = np.array(df_test['group_ages'])
 
+    print("Processing data...")
     # preprocess posts and gender input data
     x_train, x_test = preprocess_input(train_x1, train_x2, test_x1, test_x2)
 
@@ -189,4 +192,3 @@ if __name__ == "__main__":
         predictions.append(p)
     
     model_comparison(predictions, y_test)
-    
