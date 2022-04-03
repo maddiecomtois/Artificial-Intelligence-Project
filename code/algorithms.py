@@ -1,13 +1,12 @@
-from turtle import color
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy import sparse
-from sklearn.datasets import make_classification
 from sklearn.dummy import DummyClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics import (accuracy_score, auc, classification_report,
-                             multilabel_confusion_matrix, roc_curve, mean_squared_error, f1_score)
+                             multilabel_confusion_matrix, roc_curve,
+                             mean_squared_error, f1_score)
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import label_binarize
 
@@ -91,13 +90,16 @@ def get_kfold_data(text_data, gender_data, y_data):
     return kfold_data
 
 
-def run_algorithm(algorithm):
+def run_algorithm(algorithm, x_train, x_test, y_train, y_test, kfold_data):
     if algorithm == "logistic":
-        predictions, model = logistic_regression_algorithm(x_train, x_test, y_train, kfold_data)
+        predictions, model = logistic_regression_algorithm(
+            x_train, x_test, y_train, kfold_data)
     elif algorithm == "knn":
-        predictions, model = knn_algorithm(x_train, x_test, y_train, kfold_data)
+        predictions, model = knn_algorithm(x_train, x_test, y_train,
+                                           kfold_data)
     elif algorithm == "deep learning":
-        predictions, model = deep_learning_algorithm(x_train, x_test, y_train, kfold_data)
+        predictions, model = deep_learning_algorithm(x_train, x_test, y_train,
+                                                     kfold_data)
     else:
         model = DummyClassifier(strategy="most_frequent").fit(x_train, y_train)
         predictions = model.predict(x_test)
@@ -111,11 +113,12 @@ def run_algorithm(algorithm):
     print(classification_report(y_test, predictions, digits=3))
     return predictions, model
 
+
 def model_comparison(model_predictions, y_true):
     models = ['logistic', 'knn', 'deep learning']
     x_labels = np.arange(len(models))
     colors = ['r', 'g', 'b']
-    
+
     # mean squared error
     mse_scores = [mean_squared_error(y_true, p) for p in model_predictions]
 
@@ -125,17 +128,19 @@ def model_comparison(model_predictions, y_true):
     plt.ylabel("MSE")
     plt.xlabel("Models")
     plt.show()
-    
+
     # accuracy
-    accuracy_scores = [accuracy_score(y_true, pred) for pred in model_predictions]
-    
+    accuracy_scores = [
+        accuracy_score(y_true, pred) for pred in model_predictions
+    ]
+
     plt.bar(x_labels, accuracy_scores, color=colors, width=0.3)
     plt.xticks(x_labels, models)
     plt.title('Accuracy of Models')
     plt.ylabel("Accuracy Score")
     plt.xlabel("Models")
     plt.show()
-    
+
     # F1
     classes = ('Younger than 17', 'Aged 17 to 27', "Older than 27")
     f1_scores = [f1_score(y_true, p, average=None) for p in model_predictions]
@@ -148,26 +153,23 @@ def model_comparison(model_predictions, y_true):
 
     bar1 = plt.bar(x_labels, class1, width, color='r')
     bar2 = plt.bar(x_labels + width, class2, width, color='g')
-    bar3 = plt.bar(x_labels + width*2, class3, width, color='b')
+    bar3 = plt.bar(x_labels + width * 2, class3, width, color='b')
 
     plt.xlabel('Models')
     plt.ylabel('F1-Score')
     plt.title('F1-Score of Models in Each Class')
-    plt.xticks(x_labels+width, models)
+    plt.xticks(x_labels + width, models)
     plt.legend((bar1, bar2, bar3), classes)
     plt.show()
-
 
 
 if __name__ == "__main__":
 
     print("Reading in training data...")
-    # read in training set
-    df_train = pd.read_json('../data/pre_train.json')
+    df_train = pd.read_json('../data/pre_train_big.json')
 
     print("Reading in test data...")
-    # read in test set
-    df_test = pd.read_json('../data/pre_test.json')
+    df_test = pd.read_json('../data/pre_test_big.json')
 
     train_x1 = np.array(df_train['posts'])
     train_x2 = np.array([df_train['genders']])
@@ -178,17 +180,15 @@ if __name__ == "__main__":
     y_test = np.array(df_test['group_ages'])
 
     print("Processing data...")
-    # preprocess posts and gender input data
     x_train, x_test = preprocess_input(train_x1, train_x2, test_x1, test_x2)
-
     kfold_data = get_kfold_data(train_x1, train_x2, y_train)
-    _, model = run_algorithm("logistic")
-    plot_roc(x_test, y_test, model, "logistic")
 
     # comparisons -- Accuracy, Log-loss, F1
     predictions = []
-    for algo in ['logistic', 'knn', 'deep learning']:
-        p, m = run_algorithm(algo)
+    for algo in ['logistic']:
+        p, m = run_algorithm(algo, x_train, x_test, y_train, y_test,
+                             kfold_data)
         predictions.append(p)
-    
+        plot_roc(x_test, y_test, m, algo)
+
     model_comparison(predictions, y_test)
