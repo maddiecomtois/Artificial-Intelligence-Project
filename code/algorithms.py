@@ -185,7 +185,7 @@ if __name__ == "__main__":
 
     # comparisons -- Accuracy, Log-loss, F1
     predictions = []
-    for algo in ['logistic']:
+    for algo in ['logistic', 'knn', 'deep learning']:
         p, m = run_algorithm(algo, x_train, x_test, y_train, y_test,
                              kfold_data)
         predictions.append(p)
