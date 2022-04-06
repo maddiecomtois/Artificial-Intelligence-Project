@@ -5,19 +5,14 @@ from sklearn.metrics import roc_auc_score
 
 def knn_algorithm(x_train, x_test, y_train, kfold_data):
 
-    knn_model = KNeighborsClassifier(n_neighbors = 225, weights = 'distance')
+    # k = 1000 and k = 1500, performed only slightly worse than k = 850, and they may generalise better on the full dataset?
+    knn_model = KNeighborsClassifier(n_neighbors = 850, weights = 'distance')
     knn_model.fit(x_train, y_train)
 
     knn_preds = knn_model.predict(x_test)
     return knn_preds, knn_model
 
-
-"""
-knn_model = KNeighborsClassifier(n_neighbors=150, weights='uniform')
-knn_model.fit(x_train, y_train)
-"""
-
-# CROSS VALIDATION CODE FROM HERE DOWN --> chose k = 225 with 'distance' weighting
+# CROSS VALIDATION CODE FROM HERE DOWN --> chose k = 850 with 'distance' weighting
 import pandas as pd
 from algorithms import preprocess_input
 from algorithms import get_kfold_data
@@ -49,8 +44,8 @@ def test_k_values(kfold_data):
     # This function tests different k values 
     # on a knn model using cross validation.
     means = []
-    stds = []
-    k_values = [50, 100, 150, 200, 225, 250, 300]    
+    stds = []    
+    k_values = [700, 750, 800, 825, 850, 900, 1000, 1500, 2000] # 850 best, 1500 better at generalising?
     for k in k_values:
         mean, std = use_cross_validation(kfold_data, k)
         print("Average roc auc with k = {}: {} (+/− {})".format(
@@ -63,11 +58,11 @@ def test_k_values(kfold_data):
 def main():
     print("Reading in training data...")
     # read in training set
-    df_train = pd.read_json('../data/pre_train.json')
+    df_train = pd.read_json('../data/pre_train_big.json')
 
     print("Reading in test data...")
     # read in test set
-    df_test = pd.read_json('../data/pre_test.json')
+    df_test = pd.read_json('../data/pre_test_big.json')
 
     train_x1 = np.array(df_train['posts'])
     train_x2 = np.array([df_train['genders']])
