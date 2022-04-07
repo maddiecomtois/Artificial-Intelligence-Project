@@ -5,8 +5,7 @@ from scipy import sparse
 from sklearn.dummy import DummyClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics import (accuracy_score, auc, classification_report,
-                             multilabel_confusion_matrix, roc_curve,
-                             mean_squared_error, f1_score)
+                             multilabel_confusion_matrix, roc_curve, f1_score)
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import label_binarize
 
@@ -44,10 +43,11 @@ def plot_roc(x_test, y_test, model, algorithm):
             color="darkorange",
             label="ROC curve for %f (area = %0.2f)" % (i, roc_auc[i]),
         )
+        title = algorithm + " ROC Age Group " + str(i)
         plt.plot([0, 1], [0, 1], linestyle="--")
         plt.xlabel("False Positive Rate")
         plt.ylabel("True Positive Rate")
-        plt.title("Receiver operating characteristic example")
+        plt.title(title)
         plt.legend(loc="lower right")
         plt.show()
 
@@ -115,19 +115,9 @@ def run_algorithm(algorithm, x_train, x_test, y_train, y_test, kfold_data):
 
 
 def model_comparison(model_predictions, y_true):
-    models = ['logistic', 'knn', 'deep learning']
+    models = ['logistic', 'knn', 'deep learning', 'dummy']
     x_labels = np.arange(len(models))
     colors = ['r', 'g', 'b']
-
-    # mean squared error
-    mse_scores = [mean_squared_error(y_true, p) for p in model_predictions]
-
-    plt.bar(x_labels, mse_scores, color=colors, width=0.3)
-    plt.xticks(x_labels, models)
-    plt.title('MSE Comparison of Models')
-    plt.ylabel("MSE")
-    plt.xlabel("Models")
-    plt.show()
 
     # accuracy
     accuracy_scores = [
@@ -183,9 +173,9 @@ if __name__ == "__main__":
     x_train, x_test = preprocess_input(train_x1, train_x2, test_x1, test_x2)
     kfold_data = get_kfold_data(train_x1, train_x2, y_train)
 
-    # comparisons -- Accuracy, Log-loss, F1
+    # comparisons -- Accuracy, F1
     predictions = []
-    for algo in ['logistic', 'knn', 'deep learning']:
+    for algo in ['logistic', 'knn', 'deep learning', 'dummy']:
         p, m = run_algorithm(algo, x_train, x_test, y_train, y_test,
                              kfold_data)
         predictions.append(p)
