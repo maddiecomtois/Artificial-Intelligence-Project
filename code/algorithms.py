@@ -115,9 +115,9 @@ def run_algorithm(algorithm, x_train, x_test, y_train, y_test, kfold_data):
 
 
 def model_comparison(model_predictions, y_true):
-    models = ['logistic', 'knn', 'deep learning', 'dummy']
+    models = ['Logistic', 'KNN', 'MLP', 'Baseline']
     x_labels = np.arange(len(models))
-    colors = ['r', 'g', 'b']
+    colors = ['indigo', 'darkorchid', 'mediumorchid', 'slateblue']
 
     # accuracy
     accuracy_scores = [
@@ -141,9 +141,9 @@ def model_comparison(model_predictions, y_true):
     class3 = scores[:, 2]
     width = 0.2
 
-    bar1 = plt.bar(x_labels, class1, width, color='r')
-    bar2 = plt.bar(x_labels + width, class2, width, color='g')
-    bar3 = plt.bar(x_labels + width * 2, class3, width, color='b')
+    bar1 = plt.bar(x_labels, class1, width, color='lightseagreen')
+    bar2 = plt.bar(x_labels + width, class2, width, color='darkorchid')
+    bar3 = plt.bar(x_labels + width * 2, class3, width, color='sandybrown')
 
     plt.xlabel('Models')
     plt.ylabel('F1-Score')
@@ -175,7 +175,7 @@ if __name__ == "__main__":
 
     # comparisons -- Accuracy, F1
     predictions = []
-    for algo in ['logistic', 'knn', 'deep learning', 'dummy']:
+    for algo in ['logistic', 'knn', 'deep learning', 'baseline']:
         p, m = run_algorithm(algo, x_train, x_test, y_train, y_test,
                              kfold_data)
         predictions.append(p)
