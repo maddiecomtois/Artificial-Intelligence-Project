@@ -4,9 +4,10 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
+# run the MLP classifier on the training data and make predictions
 def deep_learning_algorithm(x_train, x_test, y_train, kfold_data):
     # instantiate the classifier:
-    # - 2 layers of 10 and 3 nodes
+    # - 1 hidden layer of 20 nodes
     # - relu activation function
     # - adam is solver for weight optimisation
 
@@ -23,7 +24,8 @@ def deep_learning_algorithm(x_train, x_test, y_train, kfold_data):
 
 def use_cross_validation_for_alpha(kfold_data, C):
     # This function uses k-fold cross validation to get the average ROC AUC
-    # among the k tests, as well as the standard deviation among the costs.
+    # among the k tests depending on different alpha values, as well as the standard deviation among the costs.
+    # The model was trained using a hidden layer of 2 nodes
     means = []
     # A model is trained using k-1 training segments and tested on the 1 remaining segment.
     i = 1
@@ -41,14 +43,14 @@ def use_cross_validation_for_alpha(kfold_data, C):
 
 def use_cross_validation_for_layers(kfold_data, layer_range):
     # This function uses k-fold cross validation to get the average ROC AUC
-    # among the k tests, as well as the standard deviation among the costs.
+    # among the k tests for different number of hidden layers, as well as the standard deviation among the costs.
     means = []
     i = 1
     # A model is trained using k-1 training segments and tested on the 1 remaining segment.
     for data in kfold_data:
         print("Kfold: ", i)
         x_train, y_train, x_test, y_test = data[0], data[1], data[2], data[3]
-        model = MLPClassifier(hidden_layer_sizes=layer_range, activation='relu', solver='adam', max_iter=500, alpha=1.0 / 5).fit(x_train, y_train)
+        model = MLPClassifier(hidden_layer_sizes=layer_range, activation='relu', solver='adam', max_iter=300, alpha=1.0 / 5).fit(x_train, y_train)
         preds = model.predict_proba(x_test)
         means.append(roc_auc_score(y_test, preds, multi_class="ovo"))
         i = i + 1
@@ -70,7 +72,10 @@ def test_penalty_values(kfold_data):
     # MLP classifier using cross validation.
     means = []
     stds = []
-    C_vals = [1, 5, 10, 100]
+
+    # check different penalty values to use for alpha
+    C_vals = [1, 5, 10, 20, 100]
+
     for C in C_vals:
         mean, std = use_cross_validation_for_alpha(kfold_data, C=C)
         print("Average roc auc with C penalty value = {}: {} (+/− {})".format(
@@ -85,7 +90,12 @@ def test_values_for_layers(kfold_data):
     # MLP classifier using cross validation.
     means = []
     stds = []
-    hidden_layer_range = [2, 5, 10, 25, 50, 75, 100]
+
+    # check with one layer and different number of nodes
+    hidden_layer_range = [2, 5, 10, 20, 25, 40, 50, 75, 100]
+    # check with different layers and different number of nodes
+    (layer_val1, layer_val2, layer_val3) = [(150, 100, 50), [40, 20], (10, 3), (50, 15, 10)]
+
     for layer_range in hidden_layer_range:
         mean, std = use_cross_validation_for_layers(kfold_data, layer_range=layer_range)
         print("Average roc auc with hidden layer range = {}: {} (+/− {})".format(
