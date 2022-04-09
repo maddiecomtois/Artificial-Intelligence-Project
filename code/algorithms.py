@@ -91,6 +91,7 @@ def get_kfold_data(text_data, gender_data, y_data):
 
 
 def run_algorithm(algorithm, x_train, x_test, y_train, y_test, kfold_data):
+    print(f"Running {algorithm}...")
     if algorithm == "logistic":
         predictions, model = logistic_regression_algorithm(
             x_train, x_test, y_train, kfold_data)
