@@ -4,7 +4,7 @@ Link to overleaf: https://www.overleaf.com/read/bdxccgkhdgcg
 
 Link to presentation: https://docs.google.com/presentation/d/1FQOiXauj-4q3B_oXYiBGPoEvWxN8E91ZNITNSpUkvdY/edit?usp=sharing
 
-Link to video: TODO
+Link to video: https://youtu.be/pKkAV09IERU
 
 Group Members List & Summary of Contributions:
 Madeleine Comtois  - Code: MLP Implementation 
